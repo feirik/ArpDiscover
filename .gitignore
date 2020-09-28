@@ -34,7 +34,12 @@
 *.txt
 *.log
 *.vs
+*.tlog
+*.idb
+*.pdb
+*.ilk
 
 .vs/
+debug/
 
 !License.txt

@@ -10,17 +10,17 @@
 
 PcapController::PcapController()
 {
-	bpf_u_int32 netaddr = 0, netmask = 0;
-	struct bpf_program fcode;
-	char errbuf[PCAP_ERRBUF_SIZE];
-	pcap_if_t *dev;
-	pcap_if_t *devList;
-
+	bpf_u_int32 netaddr = 0;
+	bpf_u_int32	netmask = 0;
+	pcap_if_t   *dev;
+	pcap_if_t   *devList;
 	pcap_addr_t *devAddr;
+	pcap_t      *devHandle;
 
-	pcap_t *devHandle;
+	struct bpf_program fcode;
 
 	char source[] = PCAP_SRC_IF_STRING;
+	char errbuf[PCAP_ERRBUF_SIZE];
 	char filter[] = "arp";
 
 	int devCount = 0;
@@ -42,7 +42,9 @@ PcapController::PcapController()
 			// Filter for non-zero address, netmask and sa_family
 			if (devAddr->addr->sa_family == AF_INET && devAddr->addr && devAddr->netmask)
 			{
-				printf("[%i] Found a device %s on address %s with netmask %s\n", devCount, dev->name, iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
+				printf("[%i] Found a device %s on address %s with netmask %s\n", devCount, dev->description, 
+						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), 
+						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 			}
 
 			// Print all devices
@@ -95,7 +97,7 @@ PcapController::PcapController()
 
 	printf("Capturing %s - %s\n", iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), dev->name);
 
-	if ((devHandle = pcap_open_live(dev->name, MAXBYTES2CAPTURE, 0, 512, errbuf)) == NULL)
+	if ((devHandle = pcap_open_live(dev->name, MAX_BYTES_TO_CAPTURE, 0, 512, errbuf)) == NULL)
 	{
 		fprintf(stderr, "ERROR: %s\n", errbuf);
 		//exit(1);

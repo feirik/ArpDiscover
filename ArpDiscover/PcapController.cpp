@@ -124,7 +124,13 @@ PcapController::PcapController()
 
 	pcap_freealldevs(devList);
 
-	pcap_loop(devHandle, 0, packet_handler_arp, NULL);
+	//pcap_loop(devHandle, 0, packet_handler_arp, NULL);
+
+	int ret = pcap_dispatch(devHandle, 50, packet_handler_arp, NULL);
+
+	printf("Dispatch return: %i\n", ret);
+
+	printf("After packet loop\n");
 }
 
 

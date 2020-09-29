@@ -123,5 +123,4 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf("\n");
 	}
-
 }

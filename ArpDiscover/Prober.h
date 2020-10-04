@@ -2,13 +2,24 @@
 
 #include "Misc.h"
 
+#include <vector>
+
+struct captureData
+{
+	std::string ip;
+	std::string MAC;
+	std::string vendor;
+};
+
 class Prober
 {
 public:
-	Prober(UserInput inputs);
+	Prober(userInput inputs);
 	~Prober();
 
 private:
-	UserInput m_inputs;
+	userInput m_inputs;
+
+	std::vector<captureData> m_targetData;
 };
 

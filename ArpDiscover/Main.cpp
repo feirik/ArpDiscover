@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[])
 {
-	UserInput inputs;
+	userInput inputs;
 
 	CLI::App app("ARP monitor for tracking changes to the ARP cache.");
 

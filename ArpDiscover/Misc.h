@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct UserInput
+struct userInput
 {
 	std::string interfaceIn = "";
 	bool passiveFlag = false;

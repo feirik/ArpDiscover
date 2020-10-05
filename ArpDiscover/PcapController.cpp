@@ -165,8 +165,6 @@ int PcapController::FindActiveInterfaces()
 	bpf_u_int32 netaddr = 0;
 	bpf_u_int32	netmask = 0;
 
-	std::vector<int> activeDevPositions;
-
 	pcap_if_t   *dev;
 	pcap_if_t   *devList;
 	pcap_addr_t *devAddr;
@@ -181,10 +179,11 @@ int PcapController::FindActiveInterfaces()
 	int devCount = 0;
 	int devLookup = 0;
 
-	unsigned int numberOfPacketsCaptured = 0;
+	const int		 NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
+	unsigned int     numberOfPacketsCaptured = 0;
+	std::vector<int> activeDevPositions;
 
-	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
-
+	// Populate devList with potential devices
 	if (pcap_findalldevs_ex(source, NULL, &devList, errbuf) == -1)
 	{
 		printf("There is a problem with pcap_findalldevs: %s", errbuf);
@@ -194,7 +193,7 @@ int PcapController::FindActiveInterfaces()
 	// Loop through devices
 	for (dev = devList; dev != NULL; dev = dev->next)
 	{
-		// Look through possible mulitple addresses device might have
+		// Look through possible mulitple addresses devices might have
 		for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
 		{
 			// Filter for non-zero address, netmask and sa_family
@@ -206,9 +205,6 @@ int PcapController::FindActiveInterfaces()
 					iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
 					iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 			}
-			// Print all devices
-			/*printf("[%i] Found a device %s on address %s with netmask %s\n", devCount, dev->name, iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));*/
-
 			++devCount;
 		}
 	}
@@ -221,7 +217,7 @@ int PcapController::FindActiveInterfaces()
 	if (activeDevPositions.size() == 0)
 	{
 		printf("\nFound no devices!\n");
-		//return -1;
+		// Throw exception
 	}
 
 	// Looping through all the potential active devs
@@ -235,7 +231,7 @@ int PcapController::FindActiveInterfaces()
 
 		bool breakFlag = 0;
 
-		// Iterating dev to 
+		// Iterating dev to potential device, dev->next necessary
 		for (dev = devList; dev != NULL; dev = dev->next)
 		{
 			for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
@@ -257,25 +253,28 @@ int PcapController::FindActiveInterfaces()
 
 		printf("Capturing %s - %s\n", iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), dev->name);
 
+		// Get packet capture descriptor handle
 		if ((devHandle = pcap_open_live(dev->name, MAX_BYTES_TO_CAPTURE, 0, 512, errbuf)) == NULL)
 		{
 			fprintf(stderr, "ERROR: %s\n", errbuf);
 			//exit(1);
 		}
 
-		// Look up info from the capture device
+		// Get subnet and netmask
 		if (pcap_lookupnet(dev->name, &netaddr, &netmask, errbuf) == -1)
 		{
 			fprintf(stderr, "ERROR: %s\n", errbuf);
 			//exit(1);
 		}
 
+		// Compile arp filter
 		if (pcap_compile(devHandle, &fcode, filter, 1, netmask) == -1)
 		{
 			fprintf(stderr, "ERROR: %s\n", pcap_geterr(devHandle));
 			//exit(1);
 		}
 
+		// Apply filter to device handle
 		if (pcap_setfilter(devHandle, &fcode) == -1)
 		{
 			fprintf(stderr, "ERROR: %s\n", pcap_geterr(devHandle));
@@ -285,6 +284,7 @@ int PcapController::FindActiveInterfaces()
 		int ret = 0;
 		int statSize;
 
+		// Capturing packets to check if device is receiving packet traffic
 		for (int j = 0; j < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++j)
 		{
 			ret = pcap_dispatch(devHandle, -1, packet_handler_arp, NULL);
@@ -292,6 +292,7 @@ int PcapController::FindActiveInterfaces()
 
 		printf("Dispatch return: %i\n", ret);
 
+		// Checking packet capture statistics for device
 		pcap_stat* stats = pcap_stats_ex(devHandle, &statSize);
 
 		printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);

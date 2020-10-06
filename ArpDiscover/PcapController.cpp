@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #include <iostream>
+#include <stdexcept>
 
 #include "PcapCallback.h"
 
@@ -45,8 +46,8 @@ void PcapController::CapturePackets()
 
 	if (pcap_findalldevs_ex(source, NULL, &devList, errbuf) == -1)
 	{
-		printf("There is a problem with pcap_findalldevs: %s", errbuf);
-		//return -1;
+		printf("There is a problem with pcap_findalldevs: %s line: %i in %s", errbuf, __LINE__, __func__);
+		throw std::runtime_error("pcap_findalldevs failed");
 	}
 
 	// Loop through devices
@@ -71,8 +72,7 @@ void PcapController::CapturePackets()
 	}
 	if (devCount == 0)
 	{
-		printf("\nFound no devices!\n");
-		//return -1;
+		throw std::runtime_error("Found no devices through pcap");
 	}
 
 	std::cout << "Choose capture interface number: ";
@@ -186,8 +186,8 @@ int PcapController::FindActiveInterfaces()
 	// Populate devList with potential devices
 	if (pcap_findalldevs_ex(source, NULL, &devList, errbuf) == -1)
 	{
-		printf("There is a problem with pcap_findalldevs: %s", errbuf);
-		//return -1;
+		printf("ERROR: %s line: %i in %s", errbuf, __LINE__, __func__);
+		throw std::runtime_error("pcap_findalldevs failed");
 	}
 
 	// Loop through devices
@@ -200,10 +200,6 @@ int PcapController::FindActiveInterfaces()
 			if (devAddr->addr->sa_family == AF_INET && devAddr->addr && devAddr->netmask)
 			{
 				activeDevPositions.push_back(devCount);
-				
-				printf("[%i] Found a device %s on address %s with netmask %s\n", devCount, dev->description,
-					iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
-					iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 			}
 			++devCount;
 		}
@@ -216,8 +212,7 @@ int PcapController::FindActiveInterfaces()
 
 	if (activeDevPositions.size() == 0)
 	{
-		printf("\nFound no devices!\n");
-		// Throw exception
+		throw std::runtime_error("Found no devices through pcap");
 	}
 
 	// Looping through all the potential active devs
@@ -239,6 +234,10 @@ int PcapController::FindActiveInterfaces()
 				// Iterated to potential device
 				if (devLookup == devSearchNum)
 				{
+					printf("[%i] Checking traffic for %s on address %s with netmask %s\n", devLookup, dev->description,
+						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
+						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
+
 					breakFlag = true;
 					break;
 				}
@@ -251,46 +250,41 @@ int PcapController::FindActiveInterfaces()
 			}
 		}
 
-		printf("Capturing %s - %s\n", iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr), dev->name);
-
 		// Get packet capture descriptor handle
 		if ((devHandle = pcap_open_live(dev->name, MAX_BYTES_TO_CAPTURE, 0, 512, errbuf)) == NULL)
 		{
-			fprintf(stderr, "ERROR: %s\n", errbuf);
-			//exit(1);
+			printf("ERROR: %s line: %i in %s", errbuf, __LINE__, __func__);
+			throw std::runtime_error("pcap_open_live failed");
 		}
 
 		// Get subnet and netmask
 		if (pcap_lookupnet(dev->name, &netaddr, &netmask, errbuf) == -1)
 		{
-			fprintf(stderr, "ERROR: %s\n", errbuf);
-			//exit(1);
+			printf("ERROR: %s line: %i in %s", errbuf, __LINE__, __func__);
+			throw std::runtime_error("pcap_lookupnet failed");
 		}
 
 		// Compile arp filter
 		if (pcap_compile(devHandle, &fcode, filter, 1, netmask) == -1)
 		{
-			fprintf(stderr, "ERROR: %s\n", pcap_geterr(devHandle));
-			//exit(1);
+			printf("ERROR: %s line: %i in %s", errbuf, __LINE__, __func__);
+			throw std::runtime_error("pcap_compile failed");
 		}
 
 		// Apply filter to device handle
 		if (pcap_setfilter(devHandle, &fcode) == -1)
 		{
-			fprintf(stderr, "ERROR: %s\n", pcap_geterr(devHandle));
-			//exit(1);
+			printf("ERROR: %s line: %i in %s", errbuf, __LINE__, __func__);
+			throw std::runtime_error("pcap_setfilter failed");
 		}
 
-		int ret = 0;
 		int statSize;
 
 		// Capturing packets to check if device is receiving packet traffic
 		for (int j = 0; j < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++j)
 		{
-			ret = pcap_dispatch(devHandle, -1, packet_handler_arp, NULL);
+			pcap_dispatch(devHandle, -1, packet_handler_arp, NULL);
 		}
-
-		printf("Dispatch return: %i\n", ret);
 
 		// Checking packet capture statistics for device
 		pcap_stat* stats = pcap_stats_ex(devHandle, &statSize);
@@ -311,8 +305,6 @@ int PcapController::FindActiveInterfaces()
 				m_selectedDevNum = devSearchNum;
 			}
 		}
-
-		printf("After packet loop\n");
 	}
 
 	pcap_freealldevs(devList);

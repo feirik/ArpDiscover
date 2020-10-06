@@ -18,6 +18,7 @@ public:
 	PcapController(std::vector<captureData>* m_targetData);
 	~PcapController();
 
+	void InitCapture();
 	void CapturePackets();
 
 	int FindActiveInterfaces();
@@ -25,6 +26,7 @@ public:
 private:
 	std::vector<captureData>* m_targetDataPtr;
 
-	int m_selectedDevNum = -1;
+	int     m_selectedDevNum = -1;
+	pcap_t *m_selectedDevHandle;
 };
 

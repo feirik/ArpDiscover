@@ -184,11 +184,10 @@ void PcapController::InitCapture()
 	char errbuf[PCAP_ERRBUF_SIZE];
 	char filter[] = "arp";
 
-	int devLookup = 0;
+	int  devLookup = 0;
+	bool breakFlag = 0;
 
 	printf("Packet capture - Selected device %i\n", m_selectedDevNum);
-
-	bool breakFlag = 0;
 
 	// Populate devList with potential devices
 	if (pcap_findalldevs_ex(source, NULL, &devList, errbuf) == -1)
@@ -258,9 +257,10 @@ void PcapController::InitCapture()
 
 void PcapController::CapturePackets()
 {
-	int ret = 0;
+	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
+	int       ret = 0;
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
 		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, NULL);
 	}

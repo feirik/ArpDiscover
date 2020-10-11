@@ -19,6 +19,14 @@
 // Ethernet header size
 #define H_ETH 14
 
+struct pcapPacketData
+{
+	//char ip[20] = { 0, };
+	char ip[20];
+	char MAC[20];
+	char vendor[40];
+};
+
 typedef struct arphdr {
 	u_int16_t htype;    /* Hardware Type           */
 	u_int16_t ptype;    /* Protocol Type           */

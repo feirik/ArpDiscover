@@ -7,8 +7,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "PcapCallback.h"
-
 PcapController::PcapController(std::vector<captureData>* data)
 {
 	m_targetDataPtr = data;
@@ -141,7 +139,7 @@ int PcapController::FindActiveInterfaces()
 		// Capturing packets to check if device is receiving packet traffic
 		for (int j = 0; j < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++j)
 		{
-			pcap_dispatch(devHandle, -1, packet_handler_arp, NULL);
+			pcap_dispatch(devHandle, -1, packet_handler_arp, (u_char*)&m_packetData);
 			printf(".");
 		}
 		printf("\n");
@@ -262,7 +260,7 @@ void PcapController::CapturePackets()
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
-		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, NULL);
+		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, (u_char*) &m_packetData);
 	}
 
 	printf("Dispatch return: %i\n", ret);
@@ -272,6 +270,8 @@ void PcapController::CapturePackets()
 	pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
 
 	printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
+
+	printf("Data transfer test: %s\n", m_packetData.ip);
 
 	printf("After packet capture loop\n");
 }

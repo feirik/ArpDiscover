@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <winsock.h>
 
+#include "PcapCallback.h"
+
 struct pcapDevData
 {
 	pcap_if_t dev;
@@ -25,6 +27,8 @@ public:
 
 private:
 	std::vector<captureData>* m_targetDataPtr;
+
+	pcapPacketData m_packetData;
 
 	int     m_selectedDevNum = -1;
 	pcap_t *m_selectedDevHandle;

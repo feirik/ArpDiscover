@@ -79,10 +79,10 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 	{
 		printf(" Source MAC: ");
 
-		for (int i = 0; i < 6; ++i)
+		for (int j = 0; j < 6; ++j)
 		{
-			printf("%02X", arph->sha[i]);
-			if (i < 5)
+			printf("%02X", arph->sha[j]);
+			if (j < 5)
 			{
 				printf(":");
 			}
@@ -90,10 +90,10 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf(" IP: ");
 
-		for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 		{
-			printf("%d", arph->spa[i]);
-			if (i < 3)
+			printf("%d", arph->spa[j]);
+			if (j < 3)
 			{
 				printf(".");
 			}
@@ -101,10 +101,10 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf(" Target MAC: ");
 
-		for (int i = 0; i < 6; ++i)
+		for (int j = 0; j < 6; ++j)
 		{
-			printf("%02X", arph->tha[i]);
-			if (i < 5)
+			printf("%02X", arph->tha[j]);
+			if (j < 5)
 			{
 				printf(":");
 			}
@@ -112,10 +112,10 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf(" IP: ");
 
-		for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 		{
-			printf("%d", arph->tpa[i]);
-			if (i < 3)
+			printf("%d", arph->tpa[j]);
+			if (j < 3)
 			{
 				printf(".");
 			}
@@ -123,4 +123,9 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf("\n");
 	}
+
+	pcapPacketData* testData = (pcapPacketData*)param;
+
+	strcpy_s(testData->ip, "IpTest");
+	
 }

@@ -12,31 +12,31 @@
 
 #define IPTOSBUFFERS 12
 
-#define HW_MAXDESC 9
-#define PROTOCOL_MAXDESC 8
-#define OPERATION_MAXDESC 12
+#define HW_MAXDESC 10
+#define PROTOCOL_MAXDESC 11
+#define OPERATION_MAXDESC 13
+#define TIME_MAXDESC 20
 
 // Ethernet header size
 #define H_ETH 14
 
 struct pcapPacketData
 {
-	//char ip[20] = { 0, };
 	char ip[20];
 	char MAC[20];
 	char vendor[40];
 };
 
 typedef struct arphdr {
-	u_int16_t htype;    /* Hardware Type           */
-	u_int16_t ptype;    /* Protocol Type           */
-	u_char hlen;        /* Hardware Address Length */
-	u_char plen;        /* Protocol Address Length */
-	u_int16_t oper;     /* Operation Code          */
-	u_char sha[6];      /* Sender hardware address */
-	u_char spa[4];      /* Sender IP address       */
-	u_char tha[6];      /* Target hardware address */
-	u_char tpa[4];      /* Target IP address       */
+	u_int16_t hwType;			 /* Hardware Type           */
+	u_int16_t protocolType;      /* Protocol Type           */
+	u_char hwAddrLen;            /* Hardware Address Length */
+	u_char protocolAddrLen;      /* Protocol Address Length */
+	u_int16_t operationCode;     /* Operation Code          */
+	u_char hwAddrSender[6];      /* Sender hardware address */
+	u_char ipAddrSender[4];      /* Sender IP address       */
+	u_char hwAddrTarget[6];      /* Target hardware address */
+	u_char ipAddrTarget[4];      /* Target IP address       */
 }arphdr_t;
 
 char *iptos(u_long in);

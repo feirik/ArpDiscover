@@ -20,20 +20,17 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 {
 	// Static package count
 	static int i = 0;
-	char hw[HW_MAXDESC];
-	char protocol[PROTOCOL_MAXDESC];
-	char operation[OPERATION_MAXDESC];
+	char hw		  [HW_MAXDESC]		  = { 0, };
+	char protocol [PROTOCOL_MAXDESC]  = { 0, };
+	char operation[OPERATION_MAXDESC] = { 0, };
 
 	// Time data
 	struct tm ltime;
-	char timestr[16];
+	char timestr[TIME_MAXDESC] = { 0, };
 	time_t local_tv_sec;
 
-	// Headers
+	// Arp header
 	arphdr_t *arph;
-
-	// Unused variable
-	(VOID)(param);
 
 	// convert the timestamp to readable format
 	local_tv_sec = header->ts.tv_sec;
@@ -42,31 +39,31 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	arph = (struct arphdr *)(pkt_data + H_ETH);
 
-	if (ntohs(arph->htype) == 1)
+	if (ntohs(arph->hwType) == 1)
 	{
-		strcpy_s(hw, "Ethernet");
+		strncpy_s(hw, "Ethernet", sizeof("Ethernet"));
 	}
 	else
 	{
-		strcpy_s(hw, "Unknown");
+		strncpy_s(hw, "Unknown", sizeof("Unknown"));
 	}
 
-	if (ntohs(arph->ptype) == 0x0800)
+	if (ntohs(arph->protocolType) == 0x0800)
 	{
-		strcpy_s(protocol, "IPv4");
+		strncpy_s(protocol, "IPv4", sizeof("IPv4"));
 	}
 	else
 	{
-		strcpy_s(protocol, "Unknown");
+		strncpy_s(protocol, "Unknown", sizeof("Unknown"));
 	}
 
-	if (ntohs(arph->oper) == ARP_REQUEST)
+	if (ntohs(arph->operationCode) == ARP_REQUEST)
 	{
-		strcpy_s(operation, "ARP Request");
+		strncpy_s(operation, "ARP Request", sizeof("ARP Request"));
 	}
 	else
 	{
-		strcpy_s(operation, "ARP Reply");
+		strncpy_s(operation, "ARP Reply", sizeof("ARP Reply"));
 	}
 
 	printf("[ARP %i] %s,%.6d len:%d - ", i++, timestr, header->ts.tv_usec, header->len);
@@ -75,13 +72,13 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	printf("%s", operation);
 
-	if (ntohs(arph->htype) == 1 && ntohs(arph->ptype) == 0x0800)
+	if (ntohs(arph->hwType) == 1 && ntohs(arph->protocolType) == 0x0800)
 	{
 		printf(" Source MAC: ");
 
 		for (int j = 0; j < 6; ++j)
 		{
-			printf("%02X", arph->sha[j]);
+			printf("%02X", arph->hwAddrSender[j]);
 			if (j < 5)
 			{
 				printf(":");
@@ -92,7 +89,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		for (int j = 0; j < 4; ++j)
 		{
-			printf("%d", arph->spa[j]);
+			printf("%d", arph->ipAddrSender[j]);
 			if (j < 3)
 			{
 				printf(".");
@@ -103,7 +100,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		for (int j = 0; j < 6; ++j)
 		{
-			printf("%02X", arph->tha[j]);
+			printf("%02X", arph->hwAddrTarget[j]);
 			if (j < 5)
 			{
 				printf(":");
@@ -114,7 +111,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		for (int j = 0; j < 4; ++j)
 		{
-			printf("%d", arph->tpa[j]);
+			printf("%d", arph->ipAddrTarget[j]);
 			if (j < 3)
 			{
 				printf(".");
@@ -126,6 +123,5 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	pcapPacketData* testData = (pcapPacketData*)param;
 
-	strcpy_s(testData->ip, "IpTest");
-	
+	strncpy_s(testData->ip, "IpTest", sizeof("IpTest"));
 }

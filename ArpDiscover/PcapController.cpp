@@ -271,7 +271,7 @@ void PcapController::CapturePackets()
 
 	printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
 
-	printf("Data transfer test: %s\n", m_packetData.ip);
+	printf("Data transfer test: %s\n", m_packetData.ipSender);
 
 	printf("After packet capture loop\n");
 }

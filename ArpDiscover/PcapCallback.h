@@ -17,15 +17,21 @@
 #define MAX_OPERATION_DESC_SIZE 13
 #define MAX_TIME_DESC_SIZE 20
 
+#define ETHERNET_HW_TYPE 1
+#define IPV4_ADDR 0x0800
+
+#define MAC_SIZE 18
+#define IP_SIZE 15
+
 // Ethernet header size
 #define H_ETH 14
 
 struct pcapPacketData
 {
-	char macSender[20] = { 0, };
-	char ipSender[15] = { 0, };
-	char macTarget[20] = { 0, };
-	char ipTarget[15] = { 0, };
+	char macSender[MAC_SIZE] = { 0, };
+	char ipSender[IP_SIZE]   = { 0, };
+	char macTarget[MAC_SIZE] = { 0, };
+	char ipTarget[IP_SIZE]   = { 0, };
 	bool operationIsReply = false;
 };
 

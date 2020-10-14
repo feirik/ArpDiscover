@@ -20,7 +20,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 {
 	// Static package count
 	static int i = 0;
-	char hw		  [MAX_HW_DESC_SIZE]		  = { 0, };
+	char hw		  [MAX_HW_DESC_SIZE]		= { 0, };
 	char protocol [MAX_PROTOCOL_DESC_SIZE]  = { 0, };
 	char operation[MAX_OPERATION_DESC_SIZE] = { 0, };
 
@@ -32,6 +32,9 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 	// Arp header
 	arphdr_t *arph;
 
+	// Getting struct pointer from argument passed in PcapController
+	pcapPacketData* packetData = (pcapPacketData*)param;
+
 	// convert the timestamp to readable format
 	local_tv_sec = header->ts.tv_sec;
 	localtime_s(&ltime, &local_tv_sec);
@@ -39,7 +42,24 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	arph = (struct arphdr *)(pkt_data + H_ETH);
 
-	if (ntohs(arph->hwType) == 1)
+	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
+	{
+		snprintf(packetData->ipSender, IP_SIZE, "%u.%u.%u.%u",
+				 arph->ipSender[0], arph->ipSender[1], arph->ipSender[2], arph->ipSender[3]);
+
+		snprintf(packetData->ipTarget, IP_SIZE, "%u.%u.%u.%u",
+				 arph->ipTarget[0], arph->ipTarget[1], arph->ipTarget[2], arph->ipTarget[3]);
+
+		snprintf(packetData->macSender, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				 arph->macSender[0], arph->macSender[1], arph->macSender[2], 
+				 arph->macSender[3], arph->macSender[4], arph->macSender[5]);
+
+		snprintf(packetData->macTarget, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				 arph->macTarget[0], arph->macTarget[1], arph->macTarget[2], 
+				 arph->macTarget[3], arph->macTarget[4], arph->macTarget[5]);
+	}
+
+	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE)
 	{
 		strncpy_s(hw, "Ethernet", sizeof("Ethernet"));
 	}
@@ -48,7 +68,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 		strncpy_s(hw, "Unknown", sizeof("Unknown"));
 	}
 
-	if (ntohs(arph->protocolType) == 0x0800)
+	if (ntohs(arph->protocolType) == IPV4_ADDR)
 	{
 		strncpy_s(protocol, "IPv4", sizeof("IPv4"));
 	}
@@ -72,7 +92,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	printf("%s", operation);
 
-	if (ntohs(arph->hwType) == 1 && ntohs(arph->protocolType) == 0x0800)
+	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
 	{
 		printf(" Source MAC: ");
 
@@ -120,8 +140,4 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 		printf("\n");
 	}
-
-	pcapPacketData* testData = (pcapPacketData*)param;
-
-	strncpy_s(testData->ipSender, "IpTest", sizeof("IpTest"));
 }

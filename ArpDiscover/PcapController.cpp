@@ -261,6 +261,13 @@ void PcapController::CapturePackets()
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
 		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, (u_char*) &m_packetData);
+
+		if (ret > 0)
+		{
+			printf("Data transfer IP test: %s\n", m_packetData.ipSender);
+
+			printf("Data transfer MAC test: %s\n", m_packetData.macSender);
+		}
 	}
 
 	printf("Dispatch return: %i\n", ret);
@@ -270,8 +277,6 @@ void PcapController::CapturePackets()
 	pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
 
 	printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
-
-	printf("Data transfer test: %s\n", m_packetData.ipSender);
 
 	printf("After packet capture loop\n");
 }

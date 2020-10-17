@@ -57,6 +57,15 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 		snprintf(packetData->macTarget, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
 				 arph->macTarget[0], arph->macTarget[1], arph->macTarget[2], 
 				 arph->macTarget[3], arph->macTarget[4], arph->macTarget[5]);
+
+		if (ntohs(arph->operationCode) == ARP_REPLY)
+		{
+			packetData->operationIsReply = true;
+		}
+		else
+		{
+			packetData->operationIsReply = false;
+		}
 	}
 
 	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE)

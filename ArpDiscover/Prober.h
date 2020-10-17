@@ -4,11 +4,20 @@
 
 #include <vector>
 
+struct arpEvent
+{
+	bool sender = false;
+	bool target = false;
+	bool gratious = false;
+};
+
 struct captureData
 {
 	std::string ip;
 	std::string MAC;
 	std::string vendor;
+
+	arpEvent arpEvent;
 };
 
 class Prober

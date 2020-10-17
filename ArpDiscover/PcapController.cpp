@@ -11,11 +11,11 @@ PcapController::PcapController(std::vector<captureData>* data)
 {
 	m_targetDataPtr = data;
 
-	FindActiveInterfaces();
+	findActiveInterfaces();
 
-	InitCapture();
+	initCapture();
 
-	CapturePackets();
+	capturePackets();
 }
 
 
@@ -23,7 +23,7 @@ PcapController::~PcapController()
 {
 }
 
-int PcapController::FindActiveInterfaces()
+int PcapController::findActiveInterfaces()
 {
 	bpf_u_int32 netaddr = 0;
 	bpf_u_int32	netmask = 0;
@@ -167,7 +167,7 @@ int PcapController::FindActiveInterfaces()
 	return 0;
 }
 
-void PcapController::InitCapture()
+void PcapController::initCapture()
 {
 	bpf_u_int32 netaddr = 0;
 	bpf_u_int32	netmask = 0;
@@ -253,24 +253,29 @@ void PcapController::InitCapture()
 	pcap_freealldevs(devList);
 }
 
-void PcapController::CapturePackets()
+void PcapController::capturePackets()
 {
 	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
 	int       ret = 0;
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
+		// Memset m_packetData data to 0 between captures
+
 		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, (u_char*) &m_packetData);
 
 		if (ret > 0)
 		{
-			printf("Data transfer IP test: %s\n", m_packetData.ipSender);
+			printf("Dispatch return: %i\n", ret);
 
-			printf("Data transfer MAC test: %s\n", m_packetData.macSender);
+			convertPacketDataToCppString();
+
+			std::cout << "Test cpp sender: " << m_packetDataCpp.ipSender << std::endl;
+			std::cout << "Test cpp target: " << m_packetDataCpp.ipTarget << std::endl;
+
+			clearPacketData();
 		}
 	}
-
-	printf("Dispatch return: %i\n", ret);
 
 	int statSize;
 
@@ -280,3 +285,66 @@ void PcapController::CapturePackets()
 
 	printf("After packet capture loop\n");
 }
+
+void PcapController::convertPacketDataToCppString()
+{
+	m_packetDataCpp.ipSender		 = m_packetData.ipSender;
+	m_packetDataCpp.ipTarget		 = m_packetData.ipTarget;
+	m_packetDataCpp.macSender		 = m_packetData.macSender;
+	m_packetDataCpp.macTarget		 = m_packetData.macTarget;
+	m_packetDataCpp.operationIsReply = m_packetData.operationIsReply;
+}
+
+void PcapController::clearPacketData()
+{
+	memset(m_packetData.ipSender,  0, IP_SIZE);
+	memset(m_packetData.ipTarget,  0, IP_SIZE);
+	memset(m_packetData.macSender, 0, MAC_SIZE);
+	memset(m_packetData.macTarget, 0, MAC_SIZE);
+	m_packetData.operationIsReply = false;
+
+	m_packetDataCpp.ipSender = "";
+	m_packetDataCpp.ipTarget = "";
+	m_packetDataCpp.macSender = "";
+	m_packetDataCpp.macTarget = "";
+	m_packetDataCpp.operationIsReply = false;
+}
+
+bool PcapController::manageStoredEntry(const pcapPacketData& packetData)
+{
+	bool isEntryStored = false;
+
+	for (uint32_t i = 0; i < m_targetDataPtr->size(); ++i)
+	{
+		// First check if packet was a gratious ARP packet
+		if ((m_targetDataPtr->at(i).ip == m_packetDataCpp.ipSender)
+			&& (m_packetDataCpp.ipSender == m_packetDataCpp.ipTarget)
+			&& (m_packetDataCpp.macTarget == MAC_ADDRESS_ALL_ZEROES))
+		{
+			m_targetDataPtr->at(i).arpEvent.gratious = true;
+			isEntryStored = true;
+		}
+		// Or if the IP data entry is an arp sender
+		else if (m_targetDataPtr->at(i).ip == m_packetDataCpp.ipSender)
+		{
+			m_targetDataPtr->at(i).arpEvent.sender = true;
+			isEntryStored = true;
+		}
+		// Or if the IP data entry is an arp target
+		else if (m_targetDataPtr->at(i).ip == m_packetDataCpp.ipTarget)
+		{
+			m_targetDataPtr->at(i).arpEvent.target = true;
+			isEntryStored = true;
+		}
+		else
+		{
+			isEntryStored = false;
+		}
+	}
+	
+	// Check if target or reciever matches entry already in m_targetDataPtr*/
+
+	return isEntryStored;
+}
+
+

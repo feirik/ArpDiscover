@@ -42,29 +42,64 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	arph = (struct arphdr *)(pkt_data + H_ETH);
 
+	if (packetData->ipSenderA[0] == 0)
+	{
+		printf("Equal '0' comparison\n");
+	}
+
 	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
 	{
-		snprintf(packetData->ipSender, IP_SIZE, "%u.%u.%u.%u",
-				 arph->ipSender[0], arph->ipSender[1], arph->ipSender[2], arph->ipSender[3]);
-
-		snprintf(packetData->ipTarget, IP_SIZE, "%u.%u.%u.%u",
-				 arph->ipTarget[0], arph->ipTarget[1], arph->ipTarget[2], arph->ipTarget[3]);
-
-		snprintf(packetData->macSender, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
-				 arph->macSender[0], arph->macSender[1], arph->macSender[2], 
-				 arph->macSender[3], arph->macSender[4], arph->macSender[5]);
-
-		snprintf(packetData->macTarget, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
-				 arph->macTarget[0], arph->macTarget[1], arph->macTarget[2], 
-				 arph->macTarget[3], arph->macTarget[4], arph->macTarget[5]);
-
-		if (ntohs(arph->operationCode) == ARP_REPLY)
+		// A/B packetData split - Check that A-data has not been populated
+		if (packetData->ipSenderA[0] == 0)
 		{
-			packetData->operationIsReply = true;
+			snprintf(packetData->ipSenderA, IP_SIZE, "%u.%u.%u.%u",
+				arph->ipSender[0], arph->ipSender[1], arph->ipSender[2], arph->ipSender[3]);
+
+			snprintf(packetData->ipTargetA, IP_SIZE, "%u.%u.%u.%u",
+				arph->ipTarget[0], arph->ipTarget[1], arph->ipTarget[2], arph->ipTarget[3]);
+
+			snprintf(packetData->macSenderA, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				arph->macSender[0], arph->macSender[1], arph->macSender[2],
+				arph->macSender[3], arph->macSender[4], arph->macSender[5]);
+
+			snprintf(packetData->macTargetA, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				arph->macTarget[0], arph->macTarget[1], arph->macTarget[2],
+				arph->macTarget[3], arph->macTarget[4], arph->macTarget[5]);
+
+			if (ntohs(arph->operationCode) == ARP_REPLY)
+			{
+				packetData->operationIsReplyA = true;
+			}
+			else
+			{
+				packetData->operationIsReplyA = false;
+			}
 		}
+		// If A-data is populated, store in B-data instead
 		else
 		{
-			packetData->operationIsReply = false;
+			snprintf(packetData->ipSenderB, IP_SIZE, "%u.%u.%u.%u",
+				arph->ipSender[0], arph->ipSender[1], arph->ipSender[2], arph->ipSender[3]);
+
+			snprintf(packetData->ipTargetB, IP_SIZE, "%u.%u.%u.%u",
+				arph->ipTarget[0], arph->ipTarget[1], arph->ipTarget[2], arph->ipTarget[3]);
+
+			snprintf(packetData->macSenderB, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				arph->macSender[0], arph->macSender[1], arph->macSender[2],
+				arph->macSender[3], arph->macSender[4], arph->macSender[5]);
+
+			snprintf(packetData->macTargetB, MAC_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
+				arph->macTarget[0], arph->macTarget[1], arph->macTarget[2],
+				arph->macTarget[3], arph->macTarget[4], arph->macTarget[5]);
+
+			if (ntohs(arph->operationCode) == ARP_REPLY)
+			{
+				packetData->operationIsReplyB = true;
+			}
+			else
+			{
+				packetData->operationIsReplyB = false;
+			}
 		}
 	}
 

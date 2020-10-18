@@ -28,11 +28,17 @@
 
 struct pcapPacketData
 {
-	char macSender[MAC_SIZE] = { 0, };
-	char ipSender[IP_SIZE]   = { 0, };
-	char macTarget[MAC_SIZE] = { 0, };
-	char ipTarget[IP_SIZE]   = { 0, };
-	bool operationIsReply = false;
+	char macSenderA[MAC_SIZE] = { 0, };
+	char ipSenderA [IP_SIZE]  = { 0, };
+	char macTargetA[MAC_SIZE] = { 0, };
+	char ipTargetA [IP_SIZE]  = { 0, };
+	bool operationIsReplyA    = false;
+
+	char macSenderB[MAC_SIZE] = { 0, };
+	char ipSenderB [IP_SIZE]  = { 0, };
+	char macTargetB[MAC_SIZE] = { 0, };
+	char ipTargetB [IP_SIZE]  = { 0, };
+	bool operationIsReplyB    = false;
 };
 
 typedef struct arphdr {

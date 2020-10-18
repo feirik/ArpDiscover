@@ -47,7 +47,8 @@ private:
 
 	pcapPacketData m_packetData;
 
-	packetDataAsCppString m_packetDataCpp;
+	packetDataAsCppString m_packetDataCppA;
+	packetDataAsCppString m_packetDataCppB;
 
 	int     m_selectedDevNum = -1;
 	pcap_t *m_selectedDevHandle;

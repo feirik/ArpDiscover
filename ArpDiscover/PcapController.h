@@ -40,7 +40,9 @@ public:
 
 	void clearPacketData();
 
-	bool manageStoredEntry(const pcapPacketData& packetData);
+	bool manageStoredEntry(const packetDataAsCppString& packetData);
+	void addEntry(const packetDataAsCppString& packetData);
+	void printEntries();
 
 private:
 	std::vector<captureData>* m_targetDataPtr;

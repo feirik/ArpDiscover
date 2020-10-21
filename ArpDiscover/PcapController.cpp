@@ -42,7 +42,7 @@ int PcapController::findActiveInterfaces()
 	int devCount = 0;
 	int devLookup = 0;
 
-	const int		 NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
+	const int		 NUMBER_OF_CAPTURE_BUFFER_CYCLES = 5;
 	unsigned int     numberOfPacketsCaptured = 0;
 	std::vector<int> activeDevPositions;
 
@@ -74,7 +74,7 @@ int PcapController::findActiveInterfaces()
 	}
 
 	// Looping through all the potential active devs
-	for (unsigned int i = 0; i < activeDevPositions.size(); ++i)
+	for (size_t i = 0; i < activeDevPositions.size(); ++i)
 	{
 		// Select a device
 		int devSearchNum = activeDevPositions.at(i);
@@ -255,7 +255,7 @@ void PcapController::initCapture()
 
 void PcapController::capturePackets()
 {
-	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 100;
+	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 50;
 	int       ret = 0;
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
@@ -268,32 +268,21 @@ void PcapController::capturePackets()
 		{
 			printf("Dispatch return: %i\n", ret);
 
-			bool isEntryStored = false;
-
 			convertPacketDataToCppString();
 
-			isEntryStored = manageStoredEntry(m_packetDataCppA);
-
-			if (isEntryStored == false)
-			{
-				addEntry(m_packetDataCppA);
-			}
+			manageEntries(m_packetDataCppA);
 
 			// If B-data has been captured, also analyse it
 			if (m_packetDataCppB.ipSender.at(0) != 0)
 			{
-				manageStoredEntry(m_packetDataCppB);
-				if (isEntryStored == false)
-				{
-					addEntry(m_packetDataCppB);
-				}
+				manageEntries(m_packetDataCppB);
 			}
 
-			std::cout << "Test cpp A sender: " << m_packetDataCppA.ipSender << std::endl;
-			std::cout << "Test cpp A target: " << m_packetDataCppA.ipTarget << std::endl;
+			std::cout << "Test cpp A sender: " << m_packetDataCppA.ipSender << " - " << m_packetDataCppA.macSender << std::endl;
+			std::cout << "Test cpp A target: " << m_packetDataCppA.ipTarget << " - " << m_packetDataCppA.macTarget << std::endl;
 
-			std::cout << "Test cpp B sender: " << m_packetDataCppB.ipSender << std::endl;
-			std::cout << "Test cpp B target: " << m_packetDataCppB.ipTarget << std::endl;
+			std::cout << "Test cpp B sender: " << m_packetDataCppB.ipSender << " - " << m_packetDataCppB.macSender << std::endl;
+			std::cout << "Test cpp B target: " << m_packetDataCppB.ipTarget << " - " << m_packetDataCppB.macTarget << std::endl;
 
 			printEntries();
 
@@ -319,7 +308,7 @@ void PcapController::convertPacketDataToCppString()
 	m_packetDataCppA.operationIsReply = m_packetData.operationIsReplyA;
 
 	// If data was populated in B-data (pcap_dispatch returned 2 packets), store data
-	if (m_packetData.ipSenderB[0] != '0')
+	if (m_packetData.ipSenderB[0] != 0)
 	{
 		m_packetDataCppB.ipSender = m_packetData.ipSenderB;
 		m_packetDataCppB.ipTarget = m_packetData.ipTargetB;
@@ -356,44 +345,87 @@ void PcapController::clearPacketData()
 	m_packetDataCppB.operationIsReply = false;
 }
 
-bool PcapController::manageStoredEntry(const packetDataAsCppString& packetData)
+void PcapController::manageEntries(const packetDataAsCppString& packetData)
 {
-	bool isEntryStored = false;
+	bool isSenderStored = false;
+	bool isTargetStored = false;
 
+	// Checking if sender is stored
 	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
 	{
-		// First check if packet was a gratious ARP packet
-		if ((m_targetDataPtr->at(i).ip == packetData.ipSender)
-			&& (packetData.ipSender == packetData.ipTarget)
-			&& (packetData.macTarget == MAC_ADDRESS_ALL_ZEROES))
+		if (m_targetDataPtr->at(i).ip == packetData.ipSender)
 		{
-			m_targetDataPtr->at(i).arpEvent.gratious = true;
-			isEntryStored = true;
-		}
-		// Or if the IP data entry is an arp sender
-		else if (m_targetDataPtr->at(i).ip == packetData.ipSender)
-		{
-			m_targetDataPtr->at(i).arpEvent.sender = true;
-			isEntryStored = true;
-		}
-		// Or if the IP data entry is an arp target
-		else if (m_targetDataPtr->at(i).ip == packetData.ipTarget)
-		{
-			m_targetDataPtr->at(i).arpEvent.target = true;
-			isEntryStored = true;
+			std::cout << "Compared: " << m_targetDataPtr->at(i).ip << " - " << packetData.ipSender << " was true" << std::endl;
+			isSenderStored = true;
+
+			// Update MAC if it was originally set to broadcast MAC
+			if ((m_targetDataPtr->at(i).MAC == MAC_ADDRESS_ALL_ZEROES) &&
+				(packetData.macSender != MAC_ADDRESS_ALL_ZEROES))
+			{
+				m_targetDataPtr->at(i).MAC = packetData.macSender;
+			}
+
+			break;
 		}
 		else
 		{
-			isEntryStored = false;
+			std::cout << "Compared: " << m_targetDataPtr->at(i).ip << " - " << packetData.ipSender << " was false" << std::endl;
 		}
 	}
-	
-	// Check if target or reciever matches entry already in m_targetDataPtr*/
+	if (isSenderStored == false)
+	{
+		addEntry(packetData, EntryType::sender);
+	}
 
-	return isEntryStored;
+	// Checking if target is stored
+	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
+	{
+		if (m_targetDataPtr->at(i).ip == packetData.ipTarget)
+		{
+			isTargetStored = true;
+
+			// Update MAC if it was originally set to broadcast MAC
+			if ((m_targetDataPtr->at(i).MAC == MAC_ADDRESS_ALL_ZEROES) &&
+				(packetData.macSender != MAC_ADDRESS_ALL_ZEROES))
+			{
+				m_targetDataPtr->at(i).MAC = packetData.macTarget;
+			}
+
+			break;
+		}
+	}
+	if (isTargetStored == false)
+	{
+		addEntry(packetData, EntryType::target);
+	}
+
+	// If both sender and target are stored, setting arp event flags
+	if (isSenderStored == true && isTargetStored == true)
+	{
+		for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
+		{
+			// First check if packet was a gratious ARP packet
+			if ((m_targetDataPtr->at(i).ip == packetData.ipSender)
+				&& (packetData.ipSender == packetData.ipTarget)
+				&& (packetData.macTarget == MAC_ADDRESS_ALL_ZEROES))
+			{
+				m_targetDataPtr->at(i).arpEvent.gratious = true;
+			}
+			// Or if the IP data entry is an arp sender
+			else if (m_targetDataPtr->at(i).ip == packetData.ipSender)
+			{
+				m_targetDataPtr->at(i).arpEvent.sender = true;
+			}
+			// Or if the IP data entry is an arp target
+			else if (m_targetDataPtr->at(i).ip == packetData.ipTarget)
+			{
+				m_targetDataPtr->at(i).arpEvent.target = true;
+			}
+		}
+	}
 }
 
-void PcapController::addEntry(const packetDataAsCppString& packetData)
+void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType entryType)
 {
 	captureData newEntry;
 
@@ -402,20 +434,31 @@ void PcapController::addEntry(const packetDataAsCppString& packetData)
 	    (packetData.macTarget == MAC_ADDRESS_ALL_ZEROES))
 	{
 		newEntry.arpEvent.gratious = true;
+		newEntry.ip = packetData.ipSender;
+		newEntry.MAC = packetData.macSender;
 	}
 	else
 	{
-		newEntry.ip = packetData.ipSender;
+		if (entryType == EntryType::sender)
+		{
+			newEntry.ip = packetData.ipSender;
+			newEntry.MAC = packetData.macSender;
+			newEntry.arpEvent.sender = true;
+		}
+		else
+		{
+			newEntry.ip = packetData.ipTarget;
+			newEntry.MAC = packetData.macTarget;
+			newEntry.arpEvent.target = true;
+		}
 	}
-
-	newEntry.MAC = packetData.macSender;
 
 	m_targetDataPtr->emplace_back(newEntry);
 }
 
 void PcapController::printEntries()
 {
-	std::cout << "Printing vector:" << std::endl;
+	std::cout << "Printing vector:" << " size: " << m_targetDataPtr->size() << std::endl;
 	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
 	{
 		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC << " - sender: " << m_targetDataPtr->at(i).arpEvent.sender << std::endl;

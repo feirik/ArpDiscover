@@ -10,6 +10,11 @@
 
 #define MAC_ADDRESS_ALL_ZEROES "00:00:00:00:00:00"
 
+enum EntryType {
+	sender = 0,
+	target
+};
+
 struct packetDataAsCppString
 {
 	std::string macSender;
@@ -40,8 +45,8 @@ public:
 
 	void clearPacketData();
 
-	bool manageStoredEntry(const packetDataAsCppString& packetData);
-	void addEntry(const packetDataAsCppString& packetData);
+	void manageEntries(const packetDataAsCppString& packetData);
+	void addEntry(const packetDataAsCppString& packetData, EntryType type);
 	void printEntries();
 
 private:

@@ -42,11 +42,6 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 
 	arph = (struct arphdr *)(pkt_data + H_ETH);
 
-	if (packetData->ipSenderA[0] == 0)
-	{
-		printf("Equal '0' comparison\n");
-	}
-
 	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
 	{
 		// A/B packetData split - Check that A-data has not been populated

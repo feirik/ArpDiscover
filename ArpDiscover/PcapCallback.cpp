@@ -20,9 +20,6 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 {
 	// Static package count
 	static int i = 0;
-	char hw		  [MAX_HW_DESC_SIZE]		= { 0, };
-	char protocol [MAX_PROTOCOL_DESC_SIZE]  = { 0, };
-	char operation[MAX_OPERATION_DESC_SIZE] = { 0, };
 
 	// Time data
 	struct tm ltime;
@@ -96,87 +93,5 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 				packetData->operationIsReplyB = false;
 			}
 		}
-	}
-
-	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE)
-	{
-		strncpy_s(hw, "Ethernet", sizeof("Ethernet"));
-	}
-	else
-	{
-		strncpy_s(hw, "Unknown", sizeof("Unknown"));
-	}
-
-	if (ntohs(arph->protocolType) == IPV4_ADDR)
-	{
-		strncpy_s(protocol, "IPv4", sizeof("IPv4"));
-	}
-	else
-	{
-		strncpy_s(protocol, "Unknown", sizeof("Unknown"));
-	}
-
-	if (ntohs(arph->operationCode) == ARP_REQUEST)
-	{
-		strncpy_s(operation, "ARP Request", sizeof("ARP Request"));
-	}
-	else
-	{
-		strncpy_s(operation, "ARP Reply", sizeof("ARP Reply"));
-	}
-
-	printf("[ARP %i] %s,%.6d len:%d - ", i++, timestr, header->ts.tv_usec, header->len);
-
-	//printf("%s - %s - %s", hw, protocol, operation);
-
-	printf("%s", operation);
-
-	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
-	{
-		printf(" Source MAC: ");
-
-		for (int j = 0; j < 6; ++j)
-		{
-			printf("%02X", arph->macSender[j]);
-			if (j < 5)
-			{
-				printf(":");
-			}
-		}
-
-		printf(" IP: ");
-
-		for (int j = 0; j < 4; ++j)
-		{
-			printf("%d", arph->ipSender[j]);
-			if (j < 3)
-			{
-				printf(".");
-			}
-		}
-
-		printf(" Target MAC: ");
-
-		for (int j = 0; j < 6; ++j)
-		{
-			printf("%02X", arph->macTarget[j]);
-			if (j < 5)
-			{
-				printf(":");
-			}
-		}
-
-		printf(" IP: ");
-
-		for (int j = 0; j < 4; ++j)
-		{
-			printf("%d", arph->ipTarget[j]);
-			if (j < 3)
-			{
-				printf(".");
-			}
-		}
-
-		printf("\n");
 	}
 }

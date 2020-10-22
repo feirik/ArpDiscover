@@ -255,13 +255,11 @@ void PcapController::initCapture()
 
 void PcapController::capturePackets()
 {
-	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 5000;
+	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 100;
 	int       ret = 0;
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
-		// Memset m_packetData data to 0 between captures
-
 		ret = pcap_dispatch(m_selectedDevHandle, -1, packet_handler_arp, (u_char*) &m_packetData);
 
 		if (ret > 0)
@@ -276,15 +274,6 @@ void PcapController::capturePackets()
 			if (m_packetDataCppB.ipSender.size() != 0)
 			{
 				manageEntries(m_packetDataCppB);
-			}
-
-			std::cout << "Test cpp A sender: " << m_packetDataCppA.ipSender << " - " << m_packetDataCppA.macSender << std::endl;
-			std::cout << "Test cpp A target: " << m_packetDataCppA.ipTarget << " - " << m_packetDataCppA.macTarget << std::endl;
-
-			if (m_packetDataCppB.ipSender.size() != 0)
-			{
-				std::cout << "Test cpp B sender: " << m_packetDataCppB.ipSender << " - " << m_packetDataCppB.macSender << std::endl;
-				std::cout << "Test cpp B target: " << m_packetDataCppB.ipTarget << " - " << m_packetDataCppB.macTarget << std::endl;
 			}
 
 			printEntries();
@@ -358,7 +347,6 @@ void PcapController::manageEntries(const packetDataAsCppString& packetData)
 	{
 		if (m_targetDataPtr->at(i).ip == packetData.ipSender)
 		{
-			std::cout << "Compared: " << m_targetDataPtr->at(i).ip << " - " << packetData.ipSender << " was true" << std::endl;
 			isSenderStored = true;
 
 			// Update MAC if it was originally set to broadcast MAC
@@ -369,10 +357,6 @@ void PcapController::manageEntries(const packetDataAsCppString& packetData)
 			}
 
 			break;
-		}
-		else
-		{
-			std::cout << "Compared: " << m_targetDataPtr->at(i).ip << " - " << packetData.ipSender << " was false" << std::endl;
 		}
 	}
 	if (isSenderStored == false)
@@ -463,7 +447,10 @@ void PcapController::printEntries()
 	std::cout << "Printing vector:" << " size: " << m_targetDataPtr->size() << std::endl;
 	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
 	{
-		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC << " - sender: " << m_targetDataPtr->at(i).arpEvent.sender << std::endl;
+		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC << 
+		" - gratious: " << m_targetDataPtr->at(i).arpEvent.gratious <<
+		" - sender: " << m_targetDataPtr->at(i).arpEvent.sender <<
+		" - target: " << m_targetDataPtr->at(i).arpEvent.target << std::endl;
 	}
 }
 

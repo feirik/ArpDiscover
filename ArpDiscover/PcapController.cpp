@@ -81,7 +81,7 @@ int PcapController::findActiveInterfaces()
 		devLookup = 0;
 
 		bool breakFlag = 0;
-
+		
 		// Iterating dev to potential device, dev->next necessary
 		for (dev = devList; dev != NULL; dev = dev->next)
 		{
@@ -255,7 +255,7 @@ void PcapController::initCapture()
 
 void PcapController::capturePackets()
 {
-	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 50;
+	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 5000;
 	int       ret = 0;
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
@@ -273,7 +273,7 @@ void PcapController::capturePackets()
 			manageEntries(m_packetDataCppA);
 
 			// If B-data has been captured, also analyse it
-			if (m_packetDataCppB.ipSender.at(0) != 0)
+			if (m_packetDataCppB.ipSender.size() != 0)
 			{
 				manageEntries(m_packetDataCppB);
 			}
@@ -281,8 +281,11 @@ void PcapController::capturePackets()
 			std::cout << "Test cpp A sender: " << m_packetDataCppA.ipSender << " - " << m_packetDataCppA.macSender << std::endl;
 			std::cout << "Test cpp A target: " << m_packetDataCppA.ipTarget << " - " << m_packetDataCppA.macTarget << std::endl;
 
-			std::cout << "Test cpp B sender: " << m_packetDataCppB.ipSender << " - " << m_packetDataCppB.macSender << std::endl;
-			std::cout << "Test cpp B target: " << m_packetDataCppB.ipTarget << " - " << m_packetDataCppB.macTarget << std::endl;
+			if (m_packetDataCppB.ipSender.size() != 0)
+			{
+				std::cout << "Test cpp B sender: " << m_packetDataCppB.ipSender << " - " << m_packetDataCppB.macSender << std::endl;
+				std::cout << "Test cpp B target: " << m_packetDataCppB.ipTarget << " - " << m_packetDataCppB.macTarget << std::endl;
+			}
 
 			printEntries();
 
@@ -398,7 +401,6 @@ void PcapController::manageEntries(const packetDataAsCppString& packetData)
 	{
 		addEntry(packetData, EntryType::target);
 	}
-
 	// If both sender and target are stored, setting arp event flags
 	if (isSenderStored == true && isTargetStored == true)
 	{

@@ -21,21 +21,11 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 	// Static package count
 	static int i = 0;
 
-	// Time data
-	struct tm ltime;
-	char timestr[MAX_TIME_DESC_SIZE] = { 0, };
-	time_t local_tv_sec;
-
 	// Arp header
 	arphdr_t *arph;
 
 	// Getting struct pointer from argument passed in PcapController
 	pcapPacketData* packetData = (pcapPacketData*)param;
-
-	// convert the timestamp to readable format
-	local_tv_sec = header->ts.tv_sec;
-	localtime_s(&ltime, &local_tv_sec);
-	strftime(timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
 	arph = (struct arphdr *)(pkt_data + H_ETH);
 

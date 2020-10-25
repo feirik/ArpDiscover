@@ -8,9 +8,8 @@
 #include <stdexcept>
 
 PcapController::PcapController(std::vector<captureData>* data)
+	: m_targetDataPtr(data)
 {
-	m_targetDataPtr = data;
-
 	findActiveInterfaces();
 
 	initCapture();
@@ -68,6 +67,7 @@ int PcapController::findActiveInterfaces()
 		}
 	}
 
+	// Throw exception if no potential devices were found
 	if (activeDevPositions.size() == 0)
 	{
 		throw std::runtime_error("Found no devices through pcap");
@@ -91,8 +91,8 @@ int PcapController::findActiveInterfaces()
 				if (devLookup == devSearchNum)
 				{
 					printf("[%i] Checking traffic for %s on address %s with netmask %s\n", devLookup, dev->description,
-						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
-						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
+							iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
+							iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 
 					breakFlag = true;
 					break;

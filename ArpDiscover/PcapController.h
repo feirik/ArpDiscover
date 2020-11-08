@@ -45,7 +45,7 @@ public:
 
 	void clearPacketData();
 
-	void manageEntries(const packetDataAsCppString& packetData);
+	bool manageEntries(const packetDataAsCppString& packetData);
 	void addEntry(const packetDataAsCppString& packetData, EntryType type);
 	void printEntries();
 

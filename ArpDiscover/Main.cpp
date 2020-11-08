@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
 	CLI11_PARSE(app, argc, argv);
 
-	printf("Interface: %s Passivelflag: %u\n", inputs.interfaceIn.c_str(), inputs.passiveFlag);
+	//printf("Interface: %s Passivelflag: %u\n", inputs.interfaceIn.c_str(), inputs.passiveFlag);
 
 	Prober prober(inputs);
 

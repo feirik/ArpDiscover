@@ -8,13 +8,13 @@
 
 Prober::Prober(userInput inputs)
 {
-	std::cout << "Started prober class" << std::endl;
+	//std::cout << "Started prober class" << std::endl;
 
 	m_targetData.reserve(8);
 
 	m_inputs = inputs;
 
-	std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
+	//std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
 
 	/*while (1)
 	{

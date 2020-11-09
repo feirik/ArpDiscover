@@ -6,13 +6,9 @@
 
 
 
-Prober::Prober(userInput inputs)
+Prober::Prober(userInput inputs) : m_inputs(inputs)
 {
-	//std::cout << "Started prober class" << std::endl;
-
 	m_targetData.reserve(8);
-
-	m_inputs = inputs;
 
 	//std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
 
@@ -22,6 +18,16 @@ Prober::Prober(userInput inputs)
 	}*/
 
 	PcapController controller(&m_targetData);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		controller.capturePackets();
+
+		if (controller.getIsEntryAdded() == true)
+		{
+			controller.printEntries();
+		}
+	}
 
 	while (1);
 }

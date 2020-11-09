@@ -13,8 +13,6 @@ PcapController::PcapController(std::vector<captureData>* data)
 	findActiveInterfaces();
 
 	initCapture();
-
-	capturePackets();
 }
 
 
@@ -258,10 +256,10 @@ void PcapController::initCapture()
 
 void PcapController::capturePackets()
 {
-	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 100;
+	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
 	int       ret = 0;
 
-	bool isEntryModified = false;
+	setIsEntryAdded(false);
 
 	for (int i = 0; i < NUMBER_OF_CAPTURE_BUFFER_CYCLES; ++i)
 	{
@@ -269,31 +267,29 @@ void PcapController::capturePackets()
 
 		if (ret > 0)
 		{
-			printf("Dispatch return: %i\n", ret);
+			//printf("DEUBG: Dispatch return: %i\n", ret);
 
 			convertPacketDataToCppString();
 
-			isEntryModified = manageEntries(m_packetDataCppA);
+			manageEntries(m_packetDataCppA);
 
 			// If B-data has been captured, also analyse it
 			if (m_packetDataCppB.ipSender.size() != 0)
 			{
-				isEntryModified = manageEntries(m_packetDataCppB);
+				manageEntries(m_packetDataCppB);
 			}
-
-			printEntries();
 
 			clearPacketData();
 		}
 	}
 
+	// DEBUG
 	int statSize;
 
+	// DEBUG
 	pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
 
-	printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
-
-	printf("After packet capture loop\n");
+	//printf("DEBUG: ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
 }
 
 void PcapController::convertPacketDataToCppString()
@@ -342,12 +338,10 @@ void PcapController::clearPacketData()
 	m_packetDataCppB.operationIsReply = false;
 }
 
-bool PcapController::manageEntries(const packetDataAsCppString& packetData)
+void PcapController::manageEntries(const packetDataAsCppString& packetData)
 {
 	bool isSenderStored = false;
 	bool isTargetStored = false;
-
-	bool isEntryModified = false;
 
 	// Checking if sender is stored
 	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
@@ -362,14 +356,12 @@ bool PcapController::manageEntries(const packetDataAsCppString& packetData)
 			{
 				m_targetDataPtr->at(i).MAC = packetData.macSender;
 			}
-
 			break;
 		}
 	}
 	if (isSenderStored == false)
 	{
 		addEntry(packetData, EntryType::sender);
-		isEntryModified = true;
 	}
 
 	// Checking if target is stored
@@ -385,14 +377,12 @@ bool PcapController::manageEntries(const packetDataAsCppString& packetData)
 			{
 				m_targetDataPtr->at(i).MAC = packetData.macTarget;
 			}
-
 			break;
 		}
 	}
 	if (isTargetStored == false)
 	{
 		addEntry(packetData, EntryType::target);
-		isEntryModified = true;
 	}
 	// If both sender and target are stored, setting arp event flags
 	if (isSenderStored == true && isTargetStored == true)
@@ -404,33 +394,20 @@ bool PcapController::manageEntries(const packetDataAsCppString& packetData)
 				&& (packetData.ipSender == packetData.ipTarget)
 				&& (packetData.macTarget == MAC_ADDRESS_ALL_ZEROES))
 			{
-				if (m_targetDataPtr->at(i).arpEvent.gratious == false)
-				{
 					m_targetDataPtr->at(i).arpEvent.gratious = true;
-					isEntryModified = true;
-				}
 			}
 			// Or if the IP data entry is an arp sender
 			else if (m_targetDataPtr->at(i).ip == packetData.ipSender)
 			{
-				if (m_targetDataPtr->at(i).arpEvent.sender == false)
-				{
 					m_targetDataPtr->at(i).arpEvent.sender = true;
-					isEntryModified = true;
-				}
 			}
 			// Or if the IP data entry is an arp target
 			else if (m_targetDataPtr->at(i).ip == packetData.ipTarget)
 			{
-				if (m_targetDataPtr->at(i).arpEvent.target == false)
-				{
 					m_targetDataPtr->at(i).arpEvent.target = true;
-					isEntryModified = true;
-				}
 			}
 		}
 	}
-	return isEntryModified;
 }
 
 void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType entryType)
@@ -462,6 +439,7 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 	}
 
 	m_targetDataPtr->emplace_back(newEntry);
+	setIsEntryAdded(true);
 }
 
 void PcapController::printEntries()

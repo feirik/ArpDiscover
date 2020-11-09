@@ -45,9 +45,12 @@ public:
 
 	void clearPacketData();
 
-	bool manageEntries(const packetDataAsCppString& packetData);
+	void manageEntries(const packetDataAsCppString& packetData);
 	void addEntry(const packetDataAsCppString& packetData, EntryType type);
 	void printEntries();
+
+	bool getIsEntryAdded()				    { return m_isEntryAdded; }
+	void setIsEntryAdded(bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }
 
 private:
 	std::vector<captureData>* m_targetDataPtr;
@@ -59,5 +62,6 @@ private:
 
 	int     m_selectedDevNum = -1;
 	pcap_t *m_selectedDevHandle;
+	bool    m_isEntryAdded;
 };
 

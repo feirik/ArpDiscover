@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Oui.cpp" />
     <ClCompile Include="PcapCallback.cpp" />
     <ClCompile Include="PcapController.cpp" />
     <ClCompile Include="Prober.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="Misc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Oui.h" />
     <ClInclude Include="PcapCallback.h" />
     <ClInclude Include="PcapController.h" />
     <ClInclude Include="Prober.h" />
@@ -83,10 +85,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)\Output</OutDir>
+    <OutDir>$(SolutionDir)\Output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)\Output</OutDir>
+    <OutDir>$(SolutionDir)\Output\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,6 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Deps;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WPCAP;HAVE_REMOTE</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\Deps\PcapLib</AdditionalLibraryDirectories>
@@ -120,6 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Deps;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN32;WPCAP;HAVE_REMOTE</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

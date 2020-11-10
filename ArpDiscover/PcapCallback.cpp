@@ -24,6 +24,9 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 	// Arp header
 	arphdr_t *arph;
 
+	// Unused variable from header
+	(void) header;
+
 	// Getting struct pointer from argument passed in PcapController
 	pcapPacketData* packetData = (pcapPacketData*)param;
 

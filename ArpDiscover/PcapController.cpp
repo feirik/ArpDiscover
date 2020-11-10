@@ -1,3 +1,4 @@
+#include "Oui.h"
 #include "PcapController.h"
 
 #include <stdlib.h>
@@ -284,10 +285,10 @@ void PcapController::capturePackets()
 	}
 
 	// DEBUG
-	int statSize;
+	//int statSize;
 
 	// DEBUG
-	pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
+	//pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
 
 	//printf("DEBUG: ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
 }
@@ -447,7 +448,8 @@ void PcapController::printEntries()
 	std::cout << "Printing vector:" << " size: " << m_targetDataPtr->size() << std::endl;
 	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
 	{
-		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC << 
+		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC <<
+		" - " << oui::GetVendor(m_targetDataPtr->at(i).MAC)  <<
 		" - gratious: " << m_targetDataPtr->at(i).arpEvent.gratious <<
 		" - sender: " << m_targetDataPtr->at(i).arpEvent.sender <<
 		" - target: " << m_targetDataPtr->at(i).arpEvent.target << std::endl;

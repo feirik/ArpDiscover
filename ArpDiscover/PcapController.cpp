@@ -1,4 +1,3 @@
-#include "Oui.h"
 #include "PcapController.h"
 
 #include <stdlib.h>
@@ -441,19 +440,6 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 
 	m_targetDataPtr->emplace_back(newEntry);
 	setIsEntryAdded(true);
-}
-
-void PcapController::printEntries()
-{
-	std::cout << "Printing vector:" << " size: " << m_targetDataPtr->size() << std::endl;
-	for (size_t i = 0; i < m_targetDataPtr->size(); ++i)
-	{
-		std::cout << m_targetDataPtr->at(i).ip << " - " << m_targetDataPtr->at(i).MAC <<
-		" - " << oui::GetVendor(m_targetDataPtr->at(i).MAC)  <<
-		" - gratious: " << m_targetDataPtr->at(i).arpEvent.gratious <<
-		" - sender: " << m_targetDataPtr->at(i).arpEvent.sender <<
-		" - target: " << m_targetDataPtr->at(i).arpEvent.target << std::endl;
-	}
 }
 
 

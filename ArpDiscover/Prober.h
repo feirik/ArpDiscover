@@ -26,6 +26,8 @@ public:
 	Prober(userInput inputs);
 	~Prober();
 
+	void printEntries();
+
 private:
 	userInput m_inputs;
 

@@ -90,10 +90,6 @@ int PcapController::findActiveInterfaces()
 				// Iterated to potential device
 				if (devLookup == devSearchNum)
 				{
-					/*printf("[%i] Checking traffic for %s on address %s with netmask %s\n", devLookup, dev->description,
-							iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
-							iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));*/
-
 					printf("%s", iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr));
 
 					breakFlag = true;
@@ -148,8 +144,6 @@ int PcapController::findActiveInterfaces()
 		// Checking packet capture statistics for device
 		pcap_stat* stats = pcap_stats_ex(devHandle, &statSize);
 
-		//printf("ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
-
 		// If filtered arp captures have been captured, select the interface
 		if (stats->ps_capt > 0)
 		{
@@ -203,7 +197,7 @@ void PcapController::initCapture()
 			// Iterated to potential device
 			if (devLookup == m_selectedDevNum)
 			{
-				printf("[%i] Capturing traffic for %s on address %s with netmask %s\n", devLookup, dev->description,
+				printf("Capturing traffic on %s with netmask %s\n",
 					iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
 					iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 
@@ -267,8 +261,6 @@ void PcapController::capturePackets()
 
 		if (ret > 0)
 		{
-			//printf("DEUBG: Dispatch return: %i\n", ret);
-
 			convertPacketDataToCppString();
 
 			manageEntries(m_packetDataCppA);
@@ -282,14 +274,6 @@ void PcapController::capturePackets()
 			clearPacketData();
 		}
 	}
-
-	// DEBUG
-	//int statSize;
-
-	// DEBUG
-	//pcap_stat* stats = pcap_stats_ex(m_selectedDevHandle, &statSize);
-
-	//printf("DEBUG: ps_recv: %u ps_drop: %u ps_ifdrop: %u bs_capt: %u\n", stats->ps_recv, stats->ps_drop, stats->ps_ifdrop, stats->ps_capt);
 }
 
 void PcapController::convertPacketDataToCppString()

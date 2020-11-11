@@ -47,7 +47,6 @@ public:
 
 	void manageEntries(const packetDataAsCppString& packetData);
 	void addEntry(const packetDataAsCppString& packetData, EntryType type);
-	void printEntries();
 
 	bool getIsEntryAdded()				    { return m_isEntryAdded; }
 	void setIsEntryAdded(bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }

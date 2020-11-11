@@ -43,9 +43,9 @@ typedef struct arphdr {
 	u_char protocolAddrLen;      /* Protocol Address Length */
 	u_int16_t operationCode;     /* Operation Code          */
 	u_char macSender[6];		 /* Sender MAC address      */
-	u_char ipSender[4];			 /* Sender IP address       */
+	u_char ipSender [4];		 /* Sender IP address       */
 	u_char macTarget[6];         /* Target MAC address		*/
-	u_char ipTarget[4];			 /* Target IP address       */
+	u_char ipTarget [4];		 /* Target IP address       */
 }arphdr_t;
 
 char *iptos(u_long in);

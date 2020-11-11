@@ -9,14 +9,15 @@
 Prober::Prober(userInput inputs) : m_inputs(inputs)
 {
 	const int TARGET_DATA_START_CAPACITY = 8;
+	const int CAPTURE_CYCLE_NUMBER = 10;
 
 	m_targetData.reserve(TARGET_DATA_START_CAPACITY);
 
-	//std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
+	std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
 
-	PcapController controller(&m_targetData);
+	PcapController controller(&m_targetData, m_inputs);
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < CAPTURE_CYCLE_NUMBER; ++i)
 	{
 		controller.capturePackets();
 
@@ -39,14 +40,13 @@ Prober::~Prober()
 
 void Prober::printEntries()
 {
-	std::cout << "Printing vector:" << " size: " << m_targetData.size() << std::endl;
-
+	// Print header
 	std::cout << std::left << std::setw(15) << "IP" <<
 		" * " << std::setw(17) << "MAC" <<
 		" * " << std::setw(26) << "Vendor" << std::setw(18) <<
 		" Gratious/Sender/Target" << std::endl;
 
-
+	// Print entries
 	for (size_t i = 0; i < m_targetData.size(); ++i)
 	{
 		std::cout << std::left << std::setw(15) << m_targetData.at(i).ip << 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Prober.h"
+#include "Misc.h"
 
 #include "pcap.h"
 #include <stdio.h>
@@ -33,7 +34,7 @@ struct pcapDevData
 class PcapController
 {
 public:
-	PcapController(std::vector<captureData>* m_targetData);
+	PcapController(std::vector<captureData>* data, const userInput& input);
 	~PcapController();
 
 	void initCapture();
@@ -51,8 +52,11 @@ public:
 	bool getIsEntryAdded()				    { return m_isEntryAdded; }
 	void setIsEntryAdded(bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }
 
+	bool isInterfaceInput();
+
 private:
 	std::vector<captureData>* m_targetDataPtr;
+	userInput m_inputPtr;
 
 	pcapPacketData m_packetData;
 

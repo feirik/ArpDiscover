@@ -7,10 +7,13 @@
 #include <iostream>
 #include <stdexcept>
 
-PcapController::PcapController(std::vector<captureData>* data)
-	: m_targetDataPtr(data)
+PcapController::PcapController(std::vector<captureData>* data, const userInput& input)
+	: m_targetDataPtr(data), m_inputPtr(input)
 {
-	findActiveInterfaces();
+	if (isInterfaceSet() == false)
+	{
+		findActiveInterfaces();
+	}
 
 	initCapture();
 }
@@ -180,8 +183,6 @@ void PcapController::initCapture()
 	int  devLookup = 0;
 	bool breakFlag = 0;
 
-	printf("\nPacket capture - Selected device %i\n", m_selectedDevNum);
-
 	// Populate devList with potential devices
 	if (pcap_findalldevs_ex(source, NULL, &devList, errbuf) == -1)
 	{
@@ -194,15 +195,33 @@ void PcapController::initCapture()
 	{
 		for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
 		{
-			// Iterated to potential device
-			if (devLookup == m_selectedDevNum)
+			if (isInterfaceSet() == false)
 			{
-				printf("Capturing traffic on %s with netmask %s\n",
-					iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
-					iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
+				char devIP[16] = { 0, };
 
-				breakFlag = true;
-				break;
+				snprintf(devIP, IP_SIZE, "%s",
+					iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr));
+
+				if (strncmp(m_inputPtr.interfaceIn.c_str(), devIP, 15) == 0)
+				{
+					printf("Capturing on device %s", devIP);
+					m_selectedDevNum = devLookup;
+					breakFlag = true;
+					break;
+				}
+			}
+			else
+			{
+				// Iterated to potential device
+				if (devLookup == m_selectedDevNum)
+				{
+					printf("Capturing traffic on %s with netmask %s\n",
+						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
+						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
+
+					breakFlag = true;
+					break;
+				}
 			}
 			++devLookup;
 		}
@@ -424,6 +443,18 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 
 	m_targetDataPtr->emplace_back(newEntry);
 	setIsEntryAdded(true);
+}
+
+bool PcapController::isInterfaceSet()
+{
+	if (m_inputPtr.interfaceIn == "")
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 

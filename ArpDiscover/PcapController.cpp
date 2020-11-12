@@ -195,7 +195,7 @@ void PcapController::initCapture()
 	{
 		for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
 		{
-			if (isInterfaceSet() == false)
+			if (isInterfaceSet() == true)
 			{
 				char devIP[16] = { 0, };
 
@@ -204,7 +204,8 @@ void PcapController::initCapture()
 
 				if (strncmp(m_inputPtr.interfaceIn.c_str(), devIP, 15) == 0)
 				{
-					printf("Capturing on device %s", devIP);
+					printf("Found selected interface - Capturing on device %s with netmask %s\n", devIP,
+						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 					m_selectedDevNum = devLookup;
 					breakFlag = true;
 					break;
@@ -215,7 +216,7 @@ void PcapController::initCapture()
 				// Iterated to potential device
 				if (devLookup == m_selectedDevNum)
 				{
-					printf("Capturing traffic on %s with netmask %s\n",
+					printf("Scan successful - Capturing traffic on %s with netmask %s\n",
 						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
 						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 

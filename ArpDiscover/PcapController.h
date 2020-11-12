@@ -52,7 +52,7 @@ public:
 	bool getIsEntryAdded()				    { return m_isEntryAdded; }
 	void setIsEntryAdded(bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }
 
-	bool isInterfaceInput();
+	bool isInterfaceSet();
 
 private:
 	std::vector<captureData>* m_targetDataPtr;

@@ -5,6 +5,6 @@
 struct userInput
 {
 	std::string interfaceIn = "";
-	bool passiveFlag = false;
+	bool activeFlag = false;
 };
 

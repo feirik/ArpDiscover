@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 	CLI::App app("ARP monitor for tracking changes to the ARP cache.");
 
 	app.add_option("-i,--interface", inputs.interfaceIn, "Set specific interface IP address to monitor.");
-	app.add_flag("-p,--passive", inputs.passiveFlag, "Passively monitor ARP cache if set. (No DNS lookup)");
+	app.add_flag("-a,--active", inputs.activeFlag, "Not implemented");
 
 	CLI11_PARSE(app, argc, argv);
 

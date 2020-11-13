@@ -39,8 +39,8 @@ struct pcapPacketData
 typedef struct arphdr {
 	u_int16_t hwType;			 /* Hardware Type           */
 	u_int16_t protocolType;      /* Protocol Type           */
-	u_char hwAddrLen;            /* Hardware Address Length */
-	u_char protocolAddrLen;      /* Protocol Address Length */
+	u_char    hwAddrLen;         /* Hardware Address Length */
+	u_char	  protocolAddrLen;   /* Protocol Address Length */
 	u_int16_t operationCode;     /* Operation Code          */
 	u_char macSender[6];		 /* Sender MAC address      */
 	u_char ipSender [4];		 /* Sender IP address       */

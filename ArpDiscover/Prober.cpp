@@ -13,7 +13,7 @@ Prober::Prober(userInput inputs) : m_inputs(inputs)
 
 	m_targetData.reserve(TARGET_DATA_START_CAPACITY);
 
-	std::cout << "Passive: " << inputs.passiveFlag << " Interface: " << inputs.interfaceIn << std::endl;
+	std::cout << "Active: " << inputs.activeFlag << " Interface: " << inputs.interfaceIn << std::endl;
 
 	PcapController controller(&m_targetData, m_inputs);
 

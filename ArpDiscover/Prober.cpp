@@ -13,7 +13,7 @@ Prober::Prober(userInput inputs) : m_inputs(inputs)
 
 	m_targetData.reserve(TARGET_DATA_START_CAPACITY);
 
-	std::cout << "Active: " << inputs.activeFlag << " Interface: " << inputs.interfaceIn << std::endl;
+	//std::cout << "Active: " << inputs.activeFlag << " Interface: " << inputs.interfaceIn << std::endl;
 
 	PcapController controller(&m_targetData, m_inputs);
 
@@ -38,6 +38,9 @@ Prober::~Prober()
 {
 }
 
+/* \Brief Prints a header and the entries for the interface target data
+*	No input and no output
+*/
 void Prober::printEntries()
 {
 	// Print header

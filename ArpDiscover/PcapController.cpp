@@ -18,11 +18,13 @@ PcapController::PcapController(std::vector<captureData>* data, const userInput& 
 	initCapture();
 }
 
-
 PcapController::~PcapController()
 {
 }
 
+/* \Brief Uses pcaplib to scan potential active interfaces, then selects the most active one
+*	No input and no output
+*/
 int PcapController::findActiveInterfaces()
 {
 	bpf_u_int32 netaddr = 0;
@@ -161,10 +163,20 @@ int PcapController::findActiveInterfaces()
 				m_selectedDevNum = devSearchNum;
 			}
 		}
+		if (m_selectedDevNum == -1)
+		{
+			printf("Auto scan failed - No active packets to capture\n");
+			throw std::runtime_error("findActiveInterfaces failed");
+		}
 	}
 	return 0;
 }
 
+/* \Brief Initializes a selected interface to be used for scanning
+*	If not interface is provided, the auto scan interface will be used
+*   Else selected interface will be attempted to be used
+*	No input, no output
+*/
 void PcapController::initCapture()
 {
 	bpf_u_int32 netaddr = 0;
@@ -233,6 +245,12 @@ void PcapController::initCapture()
 		}
 	}
 
+	if (isInterfaceSet() == true && m_selectedDevNum == -1)
+	{
+		printf("ERROR: Could not find selected interface\n");
+		throw std::runtime_error("initCapture failed");
+	}
+
 	// Get packet capture descriptor handle
 	if ((devHandle = pcap_open_live(dev->name, MAX_BYTES_TO_CAPTURE, 0, 512, errbuf)) == NULL)
 	{
@@ -268,6 +286,9 @@ void PcapController::initCapture()
 	pcap_freealldevs(devList);
 }
 
+/* \Brief Captures a cycle of network packets and stores the arp data
+*	No input and no output
+*/
 void PcapController::capturePackets()
 {
 	const int NUMBER_OF_CAPTURE_BUFFER_CYCLES = 10;
@@ -315,6 +336,9 @@ void PcapController::convertPacketDataToCppString()
 	}
 }
 
+/* \Brief Clears the packetData structs
+*	No input and no output
+*/
 void PcapController::clearPacketData()
 {
 	memset(m_packetData.ipSenderA,  0, IP_SIZE);
@@ -342,6 +366,9 @@ void PcapController::clearPacketData()
 	m_packetDataCppB.operationIsReply = false;
 }
 
+/* \Brief Adds entries or flags for entries based on the packet data
+*	Input of a const packetDataAsCppString reference
+*/
 void PcapController::manageEntries(const packetDataAsCppString& packetData)
 {
 	bool isSenderStored = false;
@@ -414,6 +441,9 @@ void PcapController::manageEntries(const packetDataAsCppString& packetData)
 	}
 }
 
+/* \Brief Adds an entry and sets the relevant flags
+*	Input of a const packetDataAsCppString reference and an EntryType enum
+*/
 void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType entryType)
 {
 	captureData newEntry;
@@ -446,6 +476,9 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 	setIsEntryAdded(true);
 }
 
+/* \Brief Checks to see if an interface was set as a command line argument
+*	No input, returns a bool true if set or false if not set
+*/
 bool PcapController::isInterfaceSet()
 {
 	if (m_inputPtr.interfaceIn == "")

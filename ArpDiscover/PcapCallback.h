@@ -10,16 +10,14 @@
 #define ARP_REPLY 2
 #define MAX_BYTES_TO_CAPTURE 4096
 
-#define IPTOSBUFFERS 12
+#define IPTOS_BUFFER_SIZE 12
 
 #define ETHERNET_HW_TYPE 1
 #define IPV4_ADDR 0x0800
 
 #define MAC_SIZE 18
 #define IP_SIZE 15
-
-// Ethernet header size
-#define H_ETH 14
+#define ETH_HEADER_SIZE 14
 
 struct pcapPacketData
 {

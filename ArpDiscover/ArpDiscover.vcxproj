@@ -24,7 +24,6 @@
     <ClCompile Include="PcapController.cpp" />
     <ClCompile Include="Prober.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Misc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Oui.h" />

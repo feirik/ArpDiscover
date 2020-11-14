@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-/* From tcptraceroute, convert a numeric IP address to a string */
+// From tcptraceroute, convert a numeric IP address to a string
 char *iptos(u_long in)
 {
 	static char output[IPTOSBUFFERS][3 * 4 + 3 + 1];
@@ -15,7 +15,9 @@ char *iptos(u_long in)
 	return output[which];
 }
 
-// Callback function invoked by libpcap for every incoming packet
+/* \Breif Callback function invoked by libpcap, stores packet data in passed it parameter struct
+*	Input of u_char pointer, pcap_pkthdr pointer (unused) and u_char pointer
+*/
 void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	// Static package count

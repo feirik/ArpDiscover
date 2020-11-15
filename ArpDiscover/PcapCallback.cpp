@@ -5,12 +5,12 @@
 // From tcptraceroute, convert a numeric IP address to a string
 char *iptos(u_long in)
 {
-	static char output[IPTOSBUFFERS][3 * 4 + 3 + 1];
+	static char output[IPTOS_BUFFER_SIZE][3 * 4 + 3 + 1];
 	static short which;
 	u_char *p;
 
 	p = (u_char *)&in;
-	which = (which + 1 == IPTOSBUFFERS ? 0 : which + 1);
+	which = (which + 1 == IPTOS_BUFFER_SIZE ? 0 : which + 1);
 	_snprintf_s(output[which], sizeof(output[which]), sizeof(output[which]), "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
 	return output[which];
 }
@@ -32,7 +32,7 @@ void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u
 	// Getting struct pointer from argument passed in PcapController
 	pcapPacketData* packetData = (pcapPacketData*)param;
 
-	arph = (struct arphdr *)(pkt_data + H_ETH);
+	arph = (struct arphdr *)(pkt_data + ETH_HEADER_SIZE);
 
 	if (ntohs(arph->hwType) == ETHERNET_HW_TYPE && ntohs(arph->protocolType) == IPV4_ADDR)
 	{

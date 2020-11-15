@@ -163,12 +163,14 @@ int PcapController::findActiveInterfaces()
 				m_selectedDevNum = devSearchNum;
 			}
 		}
-		if (m_selectedDevNum == -1)
-		{
-			printf("Auto scan failed - No active packets to capture\n");
-			throw std::runtime_error("findActiveInterfaces failed");
-		}
 	}
+
+	if (m_selectedDevNum == -1)
+	{
+		printf("Auto scan failed - No active packets to capture\n");
+		throw std::runtime_error("findActiveInterfaces failed");
+	}
+
 	return 0;
 }
 
@@ -228,7 +230,7 @@ void PcapController::initCapture()
 				// Iterated to potential device
 				if (devLookup == m_selectedDevNum)
 				{
-					printf("Scan successful - Capturing traffic on %s with netmask %s\n",
+					printf("\nScan successful - Capturing traffic on %s with netmask %s\n",
 						iptos(((struct sockaddr_in *)devAddr->addr)->sin_addr.s_addr),
 						iptos(((struct sockaddr_in *)devAddr->netmask)->sin_addr.s_addr));
 

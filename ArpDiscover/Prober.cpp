@@ -13,8 +13,6 @@ Prober::Prober(userInput inputs) : m_inputs(inputs)
 
 	m_targetData.reserve(TARGET_DATA_START_CAPACITY);
 
-	//std::cout << "Active: " << inputs.activeFlag << " Interface: " << inputs.interfaceIn << std::endl;
-
 	PcapController controller(&m_targetData, m_inputs);
 
 	for (int i = 0; i < CAPTURE_CYCLE_NUMBER; ++i)
@@ -29,8 +27,6 @@ Prober::Prober(userInput inputs) : m_inputs(inputs)
 
 	std::cout << "End of scan:" << std::endl;
 	printEntries();
-
-	while (1);
 }
 
 

@@ -1,7 +1,3 @@
-#include <stdio.h>
-
-#include <iostream>
-
 #include "Prober.h"
 #include "Misc.h"
 

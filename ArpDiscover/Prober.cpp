@@ -9,13 +9,13 @@
 Prober::Prober(userInput inputs) : m_inputs(inputs)
 {
 	const int TARGET_DATA_START_CAPACITY = 8;
-	const int CAPTURE_CYCLE_NUMBER = 10;
+	const int NUMBER_OF_CAPTURE_CYCLES = 10;
 
 	m_targetData.reserve(TARGET_DATA_START_CAPACITY);
 
 	PcapController controller(&m_targetData, m_inputs);
 
-	for (int i = 0; i < CAPTURE_CYCLE_NUMBER; ++i)
+	for (int i = 0; i < NUMBER_OF_CAPTURE_CYCLES; ++i)
 	{
 		controller.capturePackets();
 

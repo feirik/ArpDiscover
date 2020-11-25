@@ -12,7 +12,7 @@ namespace oui {
 
 /*
 Takes a const string MAC address as input, returns the vendor related to the OUI as a string if found
-If not found, returns '(Unknown)' as a string
+If not found, returns 'Unknown' as a string
 Uses binary search as the ouiArray is sorted
 */
 std::string GetVendor(const std::string& MACaddress)

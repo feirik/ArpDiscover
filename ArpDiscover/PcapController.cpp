@@ -61,7 +61,7 @@ int PcapController::findActiveInterfaces()
 		// Look through possible mulitple addresses devices might have
 		for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
 		{
-			// Filter for non-zero address, netmask and sa_family
+			// Filter for non-zero address, netmask and IPv4 (AF_INET)
 			if (devAddr->addr->sa_family == AF_INET && devAddr->addr && devAddr->netmask)
 			{
 				activeDevPositions.push_back(devCount);
@@ -78,7 +78,7 @@ int PcapController::findActiveInterfaces()
 
 	printf("Finding active interface - Scanning: ");
 
-	// Looping through all the potential active devs
+	// Looping through all the potential active devices
 	for (size_t i = 0; i < activeDevPositions.size(); ++i)
 	{
 		// Select a device
@@ -175,8 +175,8 @@ int PcapController::findActiveInterfaces()
 }
 
 /* \Brief Initializes a selected interface to be used for scanning
-*	If not interface is provided, the auto scan interface will be used
-*   Else selected interface will be attempted to be used
+*	If no interface is provided, the auto scan interface will be used
+*   Else the selected interface will be attempted to be used
 *	No input, no output
 */
 void PcapController::initCapture()
@@ -209,6 +209,7 @@ void PcapController::initCapture()
 	{
 		for (devAddr = dev->addresses; devAddr != NULL; devAddr = devAddr->next)
 		{
+			// Interface was provided as command line argument
 			if (isInterfaceSet() == true)
 			{
 				char devIP[16] = { 0, };
@@ -227,7 +228,7 @@ void PcapController::initCapture()
 			}
 			else
 			{
-				// Iterated to potential device
+				// Iterated to potential device from auto scan
 				if (devLookup == m_selectedDevNum)
 				{
 					printf("\nScan successful - Capturing traffic on %s with netmask %s\n",
@@ -319,21 +320,24 @@ void PcapController::capturePackets()
 	}
 }
 
+/* \Brief Converts packet data to C++ string format
+*	No input and no output
+*/
 void PcapController::convertPacketDataToCppString()
 {
-	m_packetDataCppA.ipSender		 = m_packetData.ipSenderA;
-	m_packetDataCppA.ipTarget		 = m_packetData.ipTargetA;
-	m_packetDataCppA.macSender		 = m_packetData.macSenderA;
-	m_packetDataCppA.macTarget		 = m_packetData.macTargetA;
+	m_packetDataCppA.ipSender		  = m_packetData.ipSenderA;
+	m_packetDataCppA.ipTarget		  = m_packetData.ipTargetA;
+	m_packetDataCppA.macSender		  = m_packetData.macSenderA;
+	m_packetDataCppA.macTarget		  = m_packetData.macTargetA;
 	m_packetDataCppA.operationIsReply = m_packetData.operationIsReplyA;
 
 	// If data was populated in B-data (pcap_dispatch returned 2 packets), store data
 	if (m_packetData.ipSenderB[0] != 0)
 	{
-		m_packetDataCppB.ipSender = m_packetData.ipSenderB;
-		m_packetDataCppB.ipTarget = m_packetData.ipTargetB;
-		m_packetDataCppB.macSender = m_packetData.macSenderB;
-		m_packetDataCppB.macTarget = m_packetData.macTargetB;
+		m_packetDataCppB.ipSender		  = m_packetData.ipSenderB;
+		m_packetDataCppB.ipTarget		  = m_packetData.ipTargetB;
+		m_packetDataCppB.macSender		  = m_packetData.macSenderB;
+		m_packetDataCppB.macTarget        = m_packetData.macTargetB;
 		m_packetDataCppB.operationIsReply = m_packetData.operationIsReplyB;
 	}
 }
@@ -368,7 +372,7 @@ void PcapController::clearPacketData()
 	m_packetDataCppB.operationIsReply = false;
 }
 
-/* \Brief Adds entries or flags for entries based on the packet data
+/* \Brief Adds new entries or entry flags based on the packet data
 *	Input of a const packetDataAsCppString reference
 */
 void PcapController::manageEntries(const packetDataAsCppString& packetData)

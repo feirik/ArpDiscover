@@ -1,5 +1,5 @@
 ### Background
-The purpose of the program is to discover hosts broadcasting ARP packets on Windows 10. The program passively sniffs packets and cannot verify that the packets are received as the interface on Windows 10 is likely not in monitor mode.
+The purpose of the program is to discover hosts broadcasting ARP packets on Windows 10. The program passively sniffs packets and is assuming monitor mode for the WiFi adapter to be disabled. Based on this, the program cannot verify that the packets are actually received by a host addressed in the ARP packets.
 
 ![Example output](https://github.com/feirik/ArpDiscover/blob/master/Images/ArpDiscover_readme.PNG)
 

@@ -49,10 +49,10 @@ public:
 	void manageEntries(const packetDataAsCppString& packetData);
 	void addEntry(const packetDataAsCppString& packetData, EntryType type);
 
-	bool getIsEntryAdded()				    { return m_isEntryAdded; }
-	void setIsEntryAdded(bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }
+	bool getIsEntryAdded() const				  { return m_isEntryAdded; }
+	void setIsEntryAdded(const bool isEntryAdded) { m_isEntryAdded = isEntryAdded; }
 
-	bool isInterfaceSet();
+	bool isInterfaceSet() const;
 
 private:
 	std::vector<captureData>* m_targetDataPtr;

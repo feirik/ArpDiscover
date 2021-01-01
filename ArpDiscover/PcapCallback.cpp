@@ -20,9 +20,6 @@ char *iptos(u_long in)
 */
 void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
-	// Static package count
-	static int i = 0;
-
 	// Arp header
 	arphdr_t *arph;
 

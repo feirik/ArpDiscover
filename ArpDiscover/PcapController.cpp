@@ -37,9 +37,9 @@ int PcapController::findActiveInterfaces()
 
 	struct bpf_program fcode;
 
+	const char filter[] = "arp";
 	char source[] = PCAP_SRC_IF_STRING;
 	char errbuf[PCAP_ERRBUF_SIZE];
-	char filter[] = "arp";
 
 	int devCount = 0;
 	int devLookup = 0;
@@ -190,9 +190,9 @@ void PcapController::initCapture()
 
 	struct bpf_program fcode;
 
+	const char filter[] = "arp";
 	char source[] = PCAP_SRC_IF_STRING;
 	char errbuf[PCAP_ERRBUF_SIZE];
-	char filter[] = "arp";
 
 	int  devLookup = 0;
 	bool breakFlag = 0;
@@ -485,7 +485,7 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 /* \Brief Checks to see if an interface was set as a command line argument
 *	No input, returns a bool true if set or false if not set
 */
-bool PcapController::isInterfaceSet()
+bool PcapController::isInterfaceSet() const
 {
 	if (m_inputPtr.interfaceIn == "")
 	{

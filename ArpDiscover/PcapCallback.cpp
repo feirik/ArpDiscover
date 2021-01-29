@@ -16,7 +16,7 @@ char *iptos(u_long in)
 }
 
 /* \Breif Callback function invoked by libpcap, stores packet data in passed it parameter struct
-*	Input of u_char pointer, pcap_pkthdr pointer (unused) and u_char pointer
+*   Input of u_char pointer, pcap_pkthdr pointer (unused) and u_char pointer
 */
 void packet_handler_arp(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {

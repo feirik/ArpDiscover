@@ -35,7 +35,7 @@ Prober::~Prober()
 }
 
 /* \Brief Prints a header and the entries for the interface target data
-*	No input and no output
+*   No input and no output
 */
 void Prober::printEntries()
 {
@@ -52,7 +52,7 @@ void Prober::printEntries()
 			" - " << std::setw(17) << m_targetData.at(i).MAC <<
 			" - " << std::setw(26) << oui::GetVendor(m_targetData.at(i).MAC) << std::setw(6) <<
 			" Grt: " << m_targetData.at(i).arpEvent.gratious <<
-		  "   Snd: " << m_targetData.at(i).arpEvent.sender <<
+			"   Snd: " << m_targetData.at(i).arpEvent.sender <<
 			" Tar: " << m_targetData.at(i).arpEvent.target << std::endl;
 	}
 }

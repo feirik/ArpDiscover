@@ -23,7 +23,7 @@ PcapController::~PcapController()
 }
 
 /* \Brief Uses pcaplib to scan potential active interfaces, then selects the most active one
-*	No input and no output
+*   No input and no output
 */
 int PcapController::findActiveInterfaces()
 {
@@ -175,9 +175,9 @@ int PcapController::findActiveInterfaces()
 }
 
 /* \Brief Initializes a selected interface to be used for scanning
-*	If no interface is provided, the auto scan interface will be used
+*   If no interface is provided, the auto scan interface will be used
 *   Else the selected interface will be attempted to be used
-*	No input, no output
+*   No input, no output
 */
 void PcapController::initCapture()
 {
@@ -290,7 +290,7 @@ void PcapController::initCapture()
 }
 
 /* \Brief Captures a cycle of network packets and stores the arp data
-*	No input and no output
+*   No input and no output
 */
 void PcapController::capturePackets()
 {
@@ -321,7 +321,7 @@ void PcapController::capturePackets()
 }
 
 /* \Brief Converts packet data to C++ string format
-*	No input and no output
+*   No input and no output
 */
 void PcapController::convertPacketDataToCppString()
 {
@@ -343,7 +343,7 @@ void PcapController::convertPacketDataToCppString()
 }
 
 /* \Brief Clears the packetData structs
-*	No input and no output
+*   No input and no output
 */
 void PcapController::clearPacketData()
 {
@@ -448,7 +448,7 @@ void PcapController::manageEntries(const packetDataAsCppString& packetData)
 }
 
 /* \Brief Adds an entry and sets the relevant flags
-*	Input of a const packetDataAsCppString reference and an EntryType enum
+*   Input of a const packetDataAsCppString reference and an EntryType enum
 */
 void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType entryType)
 {
@@ -483,7 +483,7 @@ void PcapController::addEntry(const packetDataAsCppString& packetData, EntryType
 }
 
 /* \Brief Checks to see if an interface was set as a command line argument
-*	No input, returns a bool true if set or false if not set
+*   No input, returns a bool true if set or false if not set
 */
 bool PcapController::isInterfaceSet() const
 {

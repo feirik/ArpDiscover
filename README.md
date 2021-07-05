@@ -5,7 +5,7 @@ The purpose of the program is to discover hosts broadcasting ARP packets on Wind
 
 ### Command line options
 
-#### -i --interface <INTERFACE IP ADDRESS> (optional)
+#### -i --interface `<INTERFACE IP ADDRESS>` (optional)
 Selects an interface to scan. If not specified, the program will attempt to scan likely interfaces and select the most active interface recieving ARP packets.
 
 ### ARP packet sniffing
